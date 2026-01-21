@@ -1,0 +1,21 @@
+
+# Percorsi
+data_path: "./res"
+checkpoint_dir: "./checkpoints"
+
+# Iperparametri
+batch_size: 32
+learning_rate: 0.0001
+epochs: 15
+patience: 3             # Early Stopping
+loss: "CrossEntropy"
+optimizer: "Adam"
+
+# Flag
+fine_tuning: True       # ResNet model
+resume_training: False
+use_augmentation: True
+download_data: False
+
+# Codifica: Nome_profondità_epoche_LR
+model_name: "Augmentation_4_30_001"  # Se resume_training è True, cerca questo modello, altrimenti ne crea uno nuovo con quel nome 
