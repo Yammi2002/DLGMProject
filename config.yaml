@@ -1,8 +1,3 @@
-
-# Percorsi
-data_path: "./res"
-checkpoint_dir: "./checkpoints"
-
 # Iperparametri
 batch_size: 32
 learning_rate: 0.0001

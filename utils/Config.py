@@ -16,9 +16,6 @@ class OptimizerType(Enum):
 
 @dataclass
 class Config:
-    # Percorsi
-    data_path: str = "./res"
-    checkpoint_dir: str = "./checkpoints"
     
     # Iperparametri
     batch_size: int = 32
@@ -57,3 +54,19 @@ class Config:
             raise ValueError(f"ERRORE: Valore non valido nel YAML. {e}")
 
         return cls(**valid_keys)
+
+    def get_loss_fn(self):
+        if self.loss == LossType.CROSS_ENTROPY:
+            return nn.CrossEntropyLoss()
+        
+        raise ValueError(f"Loss {self.loss} non implementata in get_loss_fn")
+
+    def get_optimizer_class(self):
+        if self.optimizer == OptimizerType.ADAM:
+            return optim.Adam
+        elif self.optimizer == OptimizerType.SGD:
+            return optim.SGD
+        elif self.optimizer == OptimizerType.ADAMW:
+            return optim.AdamW
+        
+        raise ValueError(f"Optimizer {self.optimizer} non implementato in get_optimizer_class")
