@@ -5,6 +5,9 @@ epochs: 15
 patience: 3             # Early Stopping
 loss: "CrossEntropy"
 optimizer: "Adam"
+weight_decay: 1e-4  
+momentum: 0.9       
+nesterov: True   
 
 # Flag
 fine_tuning: True       # ResNet model
