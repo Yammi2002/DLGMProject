@@ -40,6 +40,11 @@ class Config:
     loss: LossType = LossType.CROSS_ENTROPY
     label_smoothing: float = 0.1 
 
+    scheduler: SchedulerType = SchedulerType.NONE
+    scheduler_patience: int = 3
+    scheduler_factor: float = 0.1
+    min_lr: float = 1e-6
+
     # --- Flags ---
     fine_tuning: bool = False
     use_augmentation: bool = True
@@ -92,21 +97,35 @@ class Config:
         
         raise ValueError(f"Optimizer {self.optimizer} non implementato")
 
-    def init_scheduler(self, optimizer):
-        """Inizializza lo scheduler (opzionale)."""
+    def init_scheduler(self, optimizer, steps_per_epoch=None):
+        """
+        Inizializza lo scheduler.
+        :param optimizer: L'ottimizzatore della rete.
+        :param steps_per_epoch: Necessario SOLO per OneCycleLR (len(train_loader)).
+        """
         if self.scheduler == SchedulerType.NONE:
             return None
         
         if self.scheduler == SchedulerType.PLATEAU:
+
             return optim.lr_scheduler.ReduceLROnPlateau(
-                optimizer, mode='max', 
+                optimizer, 
+                mode='min',  
                 factor=self.scheduler_factor, 
                 patience=self.scheduler_patience, 
-                min_lr=self.min_lr,
-                verbose=True
+                min_lr=self.min_lr
             )
         
         if self.scheduler == SchedulerType.ONE_CYCLE:
-            pass 
+            if steps_per_epoch is None:
+                raise ValueError("Per utilizzare OneCycleLR devi passare 'steps_per_epoch' (len(train_loader)) a init_scheduler!")
+            
+            return optim.lr_scheduler.OneCycleLR(
+                optimizer,
+                max_lr=self.learning_rate, # Il LR massimo che raggiungerà
+                epochs=self.epochs,
+                steps_per_epoch=steps_per_epoch,
+                pct_start=0.3 # Il 30% del tempo speso per salire al max_lr, il resto per scendere
+            )
 
         return None

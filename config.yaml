@@ -1,19 +1,23 @@
 # Iperparametri
 batch_size: 32
-learning_rate: 0.0001
+learning_rate: 0.001
 epochs: 15
 patience: 3             # Early Stopping
 loss: "CrossEntropy"
 optimizer: "Adam"
-weight_decay: 1e-4  
+weight_decay: 0.0001  
 momentum: 0.9       
 nesterov: True   
 
+# --- Scheduler ---
+# Opzioni: "None", "ReduceLROnPlateau", "OneCycleLR"
+scheduler: "ReduceLROnPlateau"
+
 # Flag
-fine_tuning: True       # ResNet model
+fine_tuning: False       # ResNet model
 resume_training: False
 use_augmentation: True
 download_data: False
 
-# Codifica: Nome_profondità_epoche_LR
-model_name: "Augmentation_4_30_001"  # Se resume_training è True, cerca questo modello, altrimenti ne crea uno nuovo con quel nome 
+# Codifica: Nome_profondità_epoche_bs_LR
+model_name: "Augmentation_4_50_32_001"  # Se resume_training è True, cerca questo modello, altrimenti ne crea uno nuovo con quel nome 
