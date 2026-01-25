@@ -17,6 +17,7 @@ class OxfordPetsDataset(Dataset):
         self.annotations_path = os.path.join(root_dir, 'annotations', 'list.txt')
         
         self.data = []
+        self.targets = []
         
         if not os.path.exists(self.annotations_path):
              raise FileNotFoundError(f"Non trovo il file di annotazioni in: {self.annotations_path}")
@@ -35,6 +36,7 @@ class OxfordPetsDataset(Dataset):
                     label = class_id - 1
                     
                     self.data.append((image_name, label))
+                    self.targets.append(label)
 
     def __len__(self):
         return len(self.data)
