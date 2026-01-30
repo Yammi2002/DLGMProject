@@ -9,7 +9,7 @@ def download_data():
     Scarica, estrae e organizza il dataset Oxford-IIIT Pet.
     """
     
-    # Rimuoviamo le caretelle se già presenti per avere il dataset completo
+    # Rimuoviamo le cartelle se già presenti per avere il dataset completo
     folders_to_clean = ['images', 'annotations', 'res']
     for folder in folders_to_clean:
         if os.path.exists(folder):

@@ -12,12 +12,14 @@ nesterov: True
 # --- Scheduler ---
 # Opzioni: "None", "ReduceLROnPlateau", "OneCycleLR"
 scheduler: "OneCycleLR"
+scheduler_patience: 3
 
 # Flag
 fine_tuning: False       # ResNet model
 resume_training: True
 use_augmentation: True
 download_data: True
+use_head_crop: True
 
 # Codifica: Nome_profondità_epoche_bs_LR
 model_name: "CustomResNet_4_50_32_001"  # Se resume_training è True, cerca questo modello, altrimenti ne crea uno nuovo con quel nome 

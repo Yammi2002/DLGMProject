@@ -52,8 +52,9 @@ class DeepNarrowCNN(nn.Module):
             nn.MaxPool2d(2, 2)
         )
         
-        
+        #Questo layer serve per ridimensionare il prodotto delle convoluzioni precedenti facendo la media dei valori per ciascun canale. Questo riduce i parametri
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        
         self.fc = nn.Linear(256, num_classes)
         
         self._initialize_weights()

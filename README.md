@@ -22,7 +22,7 @@ pip install -r requirements.txt
 
 ## Configurazioni
 
-È presente un file di configurazione: ###config.yaml### che permette di configurare l'esecuzione del programma, impostando una serie di parametri.
+È presente un file di configurazione: **config.yaml** che permette di configurare l'esecuzione del programma, impostando una serie di parametri.
 
 * **Iperparametri**
   * `batch_size`

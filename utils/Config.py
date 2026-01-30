@@ -19,37 +19,47 @@ class SchedulerType(Enum):
     PLATEAU = "ReduceLROnPlateau"
     ONE_CYCLE = "OneCycleLR"
 
+"""
+Questa classe consente al programma di essere modulare, andando a recuperare le configurazioni desiderate direttamente da 
+un file e impostando delle variabili.
+Utiliza metodi factory per poter istanziare ottimizzatori e scheduler che verranno poi passati direttamente alla funzione di
+addestramento del modello.
+"""
+
 @dataclass
 class Config:
     
     model_name: str = "Improved_CNN"
+
+    # Training
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
     batch_size: int = 32
     epochs: int = 30
     patience: int = 7
-    
     learning_rate: float = 0.001
-    optimizer: OptimizerType = OptimizerType.ADAM
     
     # Parametri specifici Optimizer
+    optimizer: OptimizerType = OptimizerType.ADAM
     weight_decay: float = 1e-4  
     momentum: float = 0.9       
     nesterov: bool = True   
 
-    # --- Loss ---
+    # Loss
     loss: LossType = LossType.CROSS_ENTROPY
     label_smoothing: float = 0.1 
 
+    # Scheduler
     scheduler: SchedulerType = SchedulerType.NONE
     scheduler_patience: int = 3
     scheduler_factor: float = 0.1
     min_lr: float = 1e-6
 
-    # --- Flags ---
+    # Flags
     fine_tuning: bool = False
     use_augmentation: bool = True
     resume_training: bool = False
     download_data: bool = False
+    use_head_crop: bool = False
     
     @classmethod
     def from_yaml(cls, yaml_path):
