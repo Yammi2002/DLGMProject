@@ -22,4 +22,4 @@ download_data: True
 use_head_crop: True
 
 # Codifica: Nome_profondità_epoche_bs_LR
-model_name: "CustomResNet_4_50_32_001"  # Se resume_training è True, cerca questo modello, altrimenti ne crea uno nuovo con quel nome 
+model_name: "CustomResNet3_18_50_32_001"  # Se resume_training è True, cerca questo modello, altrimenti ne crea uno nuovo con quel nome 
