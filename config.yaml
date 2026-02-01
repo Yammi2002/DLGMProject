@@ -11,7 +11,8 @@ save_on_drive: False                        # Salvataggio su Google Drive
 batch_size: 32
 download_data: True
 use_augmentation: True     # Attiva rotazioni, flip, ecc. nel training
-use_head_crop: True        
+use_head_crop: True   
+use_segmentation: True     
 
 # ==========================================
 # 3. MODELLO E TASK

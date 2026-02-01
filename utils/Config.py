@@ -39,6 +39,7 @@ class Config:
     download_data: bool = False
     use_augmentation: bool = True
     use_head_crop: bool = False
+    use_segmentation: bool = False
 
     # Modello e task
     fine_tuning: bool = False
