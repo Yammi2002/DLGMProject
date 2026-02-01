@@ -1,25 +1,41 @@
-# Iperparametri
+# ==========================================
+# 1. IDENTITÀ ESPERIMENTO
+# ==========================================
+model_name: "CustomResNet18_SGD_HeadCrop"  # Nome esperimento
+resume_training: True                       # Se True, cerca il checkpoint
+save_on_drive: False                        # Salvataggio su Google Drive
+
+# ==========================================
+# 2. DATI E TRASFORMAZIONI
+# ==========================================
 batch_size: 32
-learning_rate: 0.001
-epochs: 50
-patience: 25             # Early Stopping
-loss: "CrossEntropy"
-optimizer: "AdamW"
-weight_decay: 0.01  
-momentum: 0.9       
-nesterov: True   
-
-# --- Scheduler ---
-# Opzioni: "None", "ReduceLROnPlateau", "OneCycleLR"
-scheduler: "OneCycleLR"
-scheduler_patience: 3
-
-# Flag
-fine_tuning: False       # ResNet model
-resume_training: True
-use_augmentation: True
 download_data: True
-use_head_crop: True
+use_augmentation: True     # Attiva rotazioni, flip, ecc. nel training
+use_head_crop: True        
 
-# Codifica: Nome_profondità_epoche_bs_LR
-model_name: "CustomResNet3_18_50_32_001"  # Se resume_training è True, cerca questo modello, altrimenti ne crea uno nuovo con quel nome 
+# ==========================================
+# 3. MODELLO E TASK
+# ==========================================
+fine_tuning: False         # False = Train from Scratch; True = Pretrained weights
+loss: "CrossEntropy"      
+
+# ==========================================
+# 4. TRAINING LOOP
+# ==========================================
+epochs: 50
+patience: 25               # Patience per Early Stopping (consiglio: disabilita o tieni alto)
+
+# ==========================================
+# 5. OTTIMIZZAZIONE
+# ==========================================
+optimizer: "SGD"          
+learning_rate: 0.01        
+weight_decay: 0.0005      
+momentum: 0.9              # Standard per SGD
+nesterov: True             # Boost per SGD
+
+# ==========================================
+# 6. SCHEDULER 
+# ==========================================
+scheduler: "OneCycleLR"   
+scheduler_patience: 3      

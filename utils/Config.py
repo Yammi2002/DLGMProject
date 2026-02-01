@@ -29,37 +29,39 @@ addestramento del modello.
 @dataclass
 class Config:
     
+    # Identità esperimento
     model_name: str = "Improved_CNN"
+    resume_training: bool = False
+    save_on_drive: bool = False
+
+    # Dati e trasformazioni
+    batch_size: int = 32
+    download_data: bool = False
+    use_augmentation: bool = True
+    use_head_crop: bool = False
+
+    # Modello e task
+    fine_tuning: bool = False
+    loss: LossType = LossType.CROSS_ENTROPY
+
 
     # Training
-    device: str = "cuda" if torch.cuda.is_available() else "cpu"
-    batch_size: int = 32
     epochs: int = 30
     patience: int = 7
+
+    # Otiimizzatore
     learning_rate: float = 0.001
-    
-    # Parametri specifici Optimizer
     optimizer: OptimizerType = OptimizerType.ADAM
     weight_decay: float = 1e-4  
     momentum: float = 0.9       
     nesterov: bool = True   
 
     # Loss
-    loss: LossType = LossType.CROSS_ENTROPY
     label_smoothing: float = 0.1 
 
     # Scheduler
     scheduler: SchedulerType = SchedulerType.NONE
     scheduler_patience: int = 3
-    scheduler_factor: float = 0.1
-    min_lr: float = 1e-6
-
-    # Flags
-    fine_tuning: bool = False
-    use_augmentation: bool = True
-    resume_training: bool = False
-    download_data: bool = False
-    use_head_crop: bool = False
     
     @classmethod
     def from_yaml(cls, yaml_path):
@@ -121,9 +123,7 @@ class Config:
             return optim.lr_scheduler.ReduceLROnPlateau(
                 optimizer, 
                 mode='min',  
-                factor=self.scheduler_factor, 
-                patience=self.scheduler_patience, 
-                min_lr=self.min_lr
+                patience=self.scheduler_patience
             )
         
         if self.scheduler == SchedulerType.ONE_CYCLE:
@@ -134,8 +134,7 @@ class Config:
                 optimizer,
                 max_lr=self.learning_rate, # Il LR massimo che raggiungerà
                 epochs=self.epochs,
-                steps_per_epoch=steps_per_epoch,
-                pct_start=0.3 # Il 30% del tempo speso per salire al max_lr, il resto per scendere
+                steps_per_epoch=steps_per_epoch
             )
 
         return None
