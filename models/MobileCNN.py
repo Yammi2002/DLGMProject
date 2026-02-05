@@ -1,11 +1,22 @@
 import torch.nn as nn
 
 """
-Questo modello si basa sull'approccio MobileNet, che ottimizza le risorse separando il lavoro spaziale da quello sui canali.
-Invece di usare un unico filtro pesante, l'operazione viene divisa in due step sequenziali:
-Prima, una convoluzione spaziale 3x3 estrae le forme lavorando su ogni canale in modo indipendente (Depthwise). 
-Successivamente, una convoluzione puntuale 1x1 si occupa di mescolare le informazioni attraverso la profondità della rete (Pointwise).
-Questo approccio 'divide et impera' permette di ottenere performance simili a reti più grandi, ma con una frazione del costo computazionale.
+MODELLO: Custom MobileNet (V1-Inspired)
+DESCRIZIONE:
+    Questo modello implementa un'architettura leggera ispirata a MobileNet V1.
+    L'obiettivo è ottimizzare il rapporto performance/costo computazionale separando 
+    l'elaborazione spaziale da quella sui canali.
+
+PRINCIPIO DI FUNZIONAMENTO:
+    Invece di usare filtri convoluzionali standard, ogni blocco opera in due fasi:
+    1. Depthwise Conv (Spaziale): Filtra ogni canale di input singolarmente.
+    2. Pointwise Conv (Canale): Combinazione lineare 1x1 dei canali (per mescolare le features).
+    
+CARATTERISTICHE ARCHITETTURALI:
+    - Downsampling: Non utilizza MaxPool. La riduzione dimensionale avviene tramite 
+      convoluzioni con stride=2.
+    - Global Average Pooling: Riduce le dimensioni spaziali a 1x1 prima del classificatore,
+      minimizzando i parametri del layer Dense finale.
 """
 
 class DepthwiseSeparableConv(nn.Module):
@@ -44,9 +55,9 @@ class DepthwiseSeparableConv(nn.Module):
         x = self.pointwise(x)
         return x
 
-class CustomMobileNet(nn.Module):
+class CustomCNN(nn.Module):
     def __init__(self, num_classes=37):
-        super(CustomMobileNet, self).__init__()
+        super(CustomCNN, self).__init__()
         
         #Questo layer è quello che si interfaccia ai layers principali della rete
         self.conv1 = nn.Sequential(
@@ -58,18 +69,18 @@ class CustomMobileNet(nn.Module):
         #Qui avvengono le convoluzioni descritte sopra, aumentando le dimensioni dei canali e riducendo quelle dell'immagine
         self.layers = nn.Sequential(
             DepthwiseSeparableConv(32, 64, stride=1),
-            DepthwiseSeparableConv(64, 128, stride=2), # Downsample
+            DepthwiseSeparableConv(64, 128, stride=2),
             DepthwiseSeparableConv(128, 128, stride=1),
-            DepthwiseSeparableConv(128, 256, stride=2), # Downsample
+            DepthwiseSeparableConv(128, 256, stride=2),
             DepthwiseSeparableConv(256, 256, stride=1),
-            DepthwiseSeparableConv(256, 512, stride=2), # Downsample
+            DepthwiseSeparableConv(256, 512, stride=2),
             
             #Cuore della rete, le dimensioni ed i canali non variano
             DepthwiseSeparableConv(512, 512, stride=1),
             DepthwiseSeparableConv(512, 512, stride=1),
             DepthwiseSeparableConv(512, 512, stride=1),
             
-            DepthwiseSeparableConv(512, 1024, stride=2), # Downsample finale
+            DepthwiseSeparableConv(512, 1024, stride=2),
             DepthwiseSeparableConv(1024, 1024, stride=1)
         )
         

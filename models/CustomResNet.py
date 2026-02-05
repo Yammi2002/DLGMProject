@@ -2,13 +2,26 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 """
-Questo modello si basa sull'approccio RasNet, che riesce ad avere un elevato numero di layer senza che si verifichi il fenomeno
-del vanishing del gradiente. Aummentando la profondità si è osservato come in strutture come la classica VCC si andasse incontro ad
-un aumento dell'errore di training e di validation. Questo fenomeno differisce dall'overfitting, in quanto si osserverebbe un aumento
-solo nel momento di validazione mentre osserverebbe una diminuzione dell'errore di training.
+MODELLO: Custom ResNet-18 (Residual Network)
+DESCRIZIONE:
+    Implementazione di una architettura ResNet-18. Questa rete è progettata per risolvere
+    il "degradation problem" che affligge le reti molto profonde.
 
-La soluzione a questo fenomeno risiede nelle skip connections, in cui a termine di un blocco convolutivo si aggiungono informazioni 
-sull'input allo stesso, evitando che si perda informazione all'aumentare della prodondità.
+IL PROBLEMA (Degradation vs Overfitting):
+    Nelle reti classiche (es. VGG), aumentare troppo la profondità porta a un aumento dell'errore
+    sia di training che di validazione. Non è overfitting (in quanto si assisterebbe ad un aumento dell'errore di validazione,
+    a dispetto di una decrescita di quello di training), ma una difficoltà di ottimizzazione dovuta alla dispersione del gradiente.
+
+LA SOLUZIONE (Skip Connections):
+    Ogni blocco convoluzionale possiede una "scorciatoia" (shortcut) che somma l'input 
+    direttamente all'output delle convoluzioni: Output = F(x) + x.
+    Questo permette al gradiente di fluire all'indietro liberamente ("identity mapping"),
+    rendendo addestrabili reti con un numero maggiore di strati.
+
+STRUTTURA:
+    - Initial Stem: Convoluzione 7x7 + MaxPool.
+    - 4 Stadi (Layers): Ognuno composto da 2 Blocchi Residui.
+    - Canali: Progressione 64 -> 128 -> 256 -> 512.
 """
 
 class ResidualBlock(nn.Module):
@@ -54,9 +67,9 @@ class ResidualBlock(nn.Module):
         out = F.relu(out)
         return out
 
-class CustomResNet18(nn.Module):
+class CustomCNN(nn.Module):
     def __init__(self, num_classes=37):
-        super(CustomResNet18, self).__init__()
+        super(CustomCNN, self).__init__()
         
         self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
         self.bn1 = nn.BatchNorm2d(64)

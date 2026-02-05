@@ -113,9 +113,13 @@ class OxfordPetsDataset(Dataset):
             np_img = np.array(image)
             np_mask = np.array(mask)
             
-            # In Oxford Trimaps: 1=Pet, 2=Sfondo, 3=Bordo
-            # Vogliamo tenere solo 1 (Pet). Tutto il resto (2 e 3) diventa nero.
-            # Creiamo una maschera binaria dove True = Sfondo
+            """
+            La segmentation si ottiene assegnando un valore diverso a seconda che il pixel appartenga all'animale, allo sfondo
+            o ad un bordo che separa i due elementi.
+            Per rimuovere lo sfondo, lo identifichiamo nella maschera, e assegnamo a zero il valore del pixel corrispondente
+            nell'immagine originale.
+            Così facendo si elimina rumore che altera la capacità di generalizzazione e la accuratezza delle previsioni del modello.
+            """
             is_background = (np_mask != 1) 
             
             # Oscuriamo l'immagine: Dove è background, impostiamo il pixel a zero

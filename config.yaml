@@ -1,8 +1,8 @@
 # ==========================================
 # 1. IDENTITÀ ESPERIMENTO
 # ==========================================
-model_name: "CustomResNet18_SGD_HeadCrop"  # Nome esperimento
-resume_training: True                       # Se True, cerca il checkpoint
+model_name: "CustomResNet18_SGD_HeadCrop"   # Nome esperimento
+resume_training: True                       # Se True, cerca il checkpoint del modello specificato in model_name
 save_on_drive: False                        # Salvataggio su Google Drive
 
 # ==========================================
@@ -11,7 +11,7 @@ save_on_drive: False                        # Salvataggio su Google Drive
 batch_size: 32
 download_data: True
 use_augmentation: True     # Attiva rotazioni, flip, ecc. nel training
-use_head_crop: True   
+use_head_crop: False   
 use_segmentation: True     
 
 # ==========================================
@@ -24,7 +24,7 @@ loss: "CrossEntropy"
 # 4. TRAINING LOOP
 # ==========================================
 epochs: 50
-patience: 25               # Patience per Early Stopping (consiglio: disabilita o tieni alto)
+patience: 25               # Patience per Early Stopping
 
 # ==========================================
 # 5. OTTIMIZZAZIONE
@@ -32,8 +32,8 @@ patience: 25               # Patience per Early Stopping (consiglio: disabilita 
 optimizer: "SGD"          
 learning_rate: 0.01        
 weight_decay: 0.0005      
-momentum: 0.9              # Standard per SGD
-nesterov: True             # Boost per SGD
+momentum: 0.9            
+nesterov: True          
 
 # ==========================================
 # 6. SCHEDULER 

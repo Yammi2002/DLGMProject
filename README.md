@@ -2,7 +2,7 @@
 
 Questo progetto esplora diverse tecniche di Deep Learning per il riconoscimento e la classificazione delle razze di cani e gatti, utilizzando il dataset **Oxford-IIIT Pet**.
 
-L'obiettivo è produrre diversi modelli, sia custom che preaddesrati e modificati mediante fine-tuning, per riconoscere con la maggiore accuratezza possibile quale razza sia presente nelle immagini.
+L'obiettivo è produrre diversi modelli, sia custom che preaddesrati e modificati mediante fine-tuning, per riconoscere con la maggiore accuratezza possibile la razza degli animali presenti nelle immagini.
 
 ## Dataset
 
@@ -50,6 +50,7 @@ Parametri tecnici relativi all'algoritmo di discesa del gradiente.
 Interruttori per attivare o disattivare funzionalità specifiche.
 
 * **`use_head_crop`**: **[Importante]** Se `True`, utilizza le annotazioni XML (Bounding Box) per ritagliare e addestrare la rete solo sui volti degli animali, eliminando il rumore di fondo.
+* **`use_segmentation`**: **[Importante]** Se `True`, utilizza le annotazioni trimaps per rimuovere lo sfondo dalle immagini.
 * **`use_augmentation`**: Se `True`, applica trasformazioni casuali (flip, crop, color jitter) durante il training per migliorare la generalizzazione.
 * **`fine_tuning`**:
   * `True`: Utilizza una rete pre-addestrata (Transfer Learning) e allena solo l'ultimo layer.

@@ -2,21 +2,25 @@ import torch
 import torch.nn as nn
 
 """
-Questo modello implementa un'architettura "Deep & Narrow" ispirata allo stile VGG.
-La rete è composta da una sequenza di 10 strati convoluzionali (kernel 3x3) organizzati in 4 blocchi,
-ognuno seguito da Max Pooling per la riduzione dimensionale.
+MODELLO: Deep & Narrow CNN (Custom VGG-Style)
+DESCRIZIONE:
+    Questa rete implementa una filosofia "Deep & Narrow.
+    A differenza delle architetture classiche molto larghe, questa rete punta sulla profondità 
+    (10 layer convoluzionali) mantenendo il numero di canali contenuto (max 256).
 
-Caratteristiche distintive:
-1. Uso sistematico di Batch Normalization dopo ogni convoluzione per stabilizzare il gradiente in profondità.
-2. Larghezza contenuta (max 256 canali) per limitare il costo computazionale.
-3. Global Average Pooling (GAP) finale: riduce le feature spaziali a un singolo vettore per canale, 
-   eliminando la necessità di strati densi (Fully Connected) intermedi pesanti e riducendo drasticamente i parametri.
-Obiettivo: Massimizzare l'efficienza parametrica mantenendo una buona capacità di generalizzazione.
+CARATTERISTICHE ARCHITETTURALI:
+    - Stack Convoluzionale: 4 blocchi progressivi. I primi due contengono 2 convoluzioni, 
+      gli ultimi due ne contengono 3. Totale: 10 strati di feature extraction.
+    - Efficienza (GAP): L'uso del Global Average Pooling finale elimina la necessità di 
+      pesanti layer Fully Connected intermedi, riducendo drasticamente i parametri 
+      e prevenendo l'overfitting.
+    - Stabilizzazione: Batch Normalization sistematica dopo ogni conv per permettere 
+      al gradiente di fluire attraverso i 10 strati senza svanire.
 """
 
-class DeepNarrowCNN(nn.Module):
+class CustomCnn(nn.Module):
     def __init__(self, num_classes=37):
-        super(DeepNarrowCNN, self).__init__()
+        super(CustomCnn, self).__init__()
         
         # Helper per creare un blocco Conv -> BN -> ReLU
         def conv_block(in_c, out_c):
