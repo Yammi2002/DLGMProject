@@ -2,18 +2,18 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 """
-MODELLO: Custom ResNet-18 (Residual Network)
+MODELLO: Custom ResNet-18 (ispirato all'architettura RenSet: Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun (2016) "Deep Residual Learning for Image Recognition")
 DESCRIZIONE:
     Implementazione di una architettura ResNet-18. Questa rete è progettata per risolvere
     il "degradation problem" che affligge le reti molto profonde.
 
-IL PROBLEMA (Degradation vs Overfitting):
+IL PROBLEMA:
     Nelle reti classiche (es. VGG), aumentare troppo la profondità porta a un aumento dell'errore
     sia di training che di validazione. Non è overfitting (in quanto si assisterebbe ad un aumento dell'errore di validazione,
     a dispetto di una decrescita di quello di training), ma una difficoltà di ottimizzazione dovuta alla dispersione del gradiente.
 
 LA SOLUZIONE (Skip Connections):
-    Ogni blocco convoluzionale possiede una "scorciatoia" (shortcut) che somma l'input 
+    Ogni blocco convoluzionale possiede una connessione ("shortcut") che somma l'input 
     direttamente all'output delle convoluzioni: Output = F(x) + x.
     Questo permette al gradiente di fluire all'indietro liberamente ("identity mapping"),
     rendendo addestrabili reti con un numero maggiore di strati.
@@ -47,7 +47,7 @@ class ResidualBlock(nn.Module):
         Questo controllo è essenziale in quanto la dimensione dell'input e dell'output di un blocco convolutivo in cui si utilizza
         una skip connection deve essere della stessa dimensione.
         Quando si applica uno stride diverso da 1 per andare a decremnetare la dimensione dell'immagine ed aumentare il numero dei
-        canali non è possibile applicare una skip connection.        
+        canali non sarebbe possibile applicare una skip connection direttamnete, quindi si utilizza una convoluzione 1x1 per renderla possibile a livello di dimensioni.        
         """
         if stride != 1 or in_channels != out_channels:
             self.shortcut = nn.Sequential(
@@ -108,7 +108,7 @@ class CustomCNN(nn.Module):
         x = self.layer4(x) 
         
         x = self.avg_pool(x)
-        x = x.view(x.size(0), -1) 
+        x = x.view(x.size(0), -1) #Ridimensioniamo il tensore da passare al classificatore finale, passiamo da 4 dimensioni a 2
         x = self.fc(x)
         
         return x

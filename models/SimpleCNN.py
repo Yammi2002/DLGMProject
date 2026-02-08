@@ -1,23 +1,23 @@
 import torch.nn as nn
 
 """
-MODELLO: Mini-VGG (CustomNN)
+MODELLO: SimpleCNN (ispirato all'architettura stile VCC, con molti meno layer)
 DESCRIZIONE:
     Questo modello rappresenta la baseline di partenza per i futuri esperimenti.
     Segue un'architettura stile VGG semplificata con 8 strati apprendibili (6 Conv + 2 FC).
 
 CARATTERISTICHE PRINCIPALI:
     - Input: Immagini RGB (3 canali).
-    - Backbone: 3 blocchi sequenziali, ognuno composto da doppia convoluzione 3x3, 
+    - L'estrazione delle feature avviene mediante 3 blocchi sequenziali, ognuno composto da doppia convoluzione 3x3, 
       Batch Normalization, ReLU e Max Pooling 2x2.
-    - Bottleneck: Utilizza Global Average Pooling (AdaptiveAvgPool) invece del semplice Flatten.
-      Questo riduce drasticamente il numero di parametri e previene l'overfitting spaziale.
+    - Per passare i dati al layer lineare che eseguire la classificazione si utilizza Global Average Pooling (AdaptiveAvgPool),
+      invece del semplice Flatten. Questo riduce drasticamente il numero di parametri e previene l'overfitting spaziale.
     - Classificatore: MLP a due stadi (256 -> 512 -> num_classes) con Dropout (0.5).
 """
 
-class CustomNN(nn.Module):
+class CustomCNN(nn.Module):
     def __init__(self, num_classes=37):
-        super(CustomNN, self).__init__()
+        super(CustomCNN, self).__init__()
         
         self.block1 = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=3, padding=1),

@@ -1,7 +1,7 @@
 import torch.nn as nn
 
 """
-MODELLO: Custom MobileNet (V1-Inspired)
+MODELLO: Custom MobileNet (ispirato dall'architettura MobileNet: Howard, A. G., et al. (2017) "MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications.")
 DESCRIZIONE:
     Questo modello implementa un'architettura leggera ispirata a MobileNet V1.
     L'obiettivo è ottimizzare il rapporto performance/costo computazionale separando 
@@ -10,7 +10,7 @@ DESCRIZIONE:
 PRINCIPIO DI FUNZIONAMENTO:
     Invece di usare filtri convoluzionali standard, ogni blocco opera in due fasi:
     1. Depthwise Conv (Spaziale): Filtra ogni canale di input singolarmente.
-    2. Pointwise Conv (Canale): Combinazione lineare 1x1 dei canali (per mescolare le features).
+    2. Pointwise Conv (Canale): Combinazione lineare 1x1 dei canali.
     
 CARATTERISTICHE ARCHITETTURALI:
     - Downsampling: Non utilizza MaxPool. La riduzione dimensionale avviene tramite 
@@ -99,12 +99,19 @@ class CustomCNN(nn.Module):
         x = self.conv1(x)
         x = self.layers(x)
         x = self.avg_pool(x)
-        x = x.view(x.size(0), -1)
+        x = x.view(x.size(0), -1) #Ridimensioniamo il tensore da passare al classificatore finale, passiamo da 4 dimensioni a 2
         x = self.dropout(x)
         x = self.fc(x)
         return x
 
     def _initialize_weights(self):
+        """
+        Inizializza i pesi del modello seguendo le best practice per reti deep.
+        Viene fatto sia per i layer convoluzionali che per i layer di batch normalization.
+        Lo scopo è quello di ridurre l'effetto di scomparsa del gradiente, che solitamente si verifica quando aumenta
+        la profondità della rete.
+        Segnale di questo fenomeno è l'innalzamento dell'errore di training e di quello di validazione.
+        """ 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out')

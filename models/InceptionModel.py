@@ -1,19 +1,27 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 """
-Questo modello si ispira all'architettura Inception (GoogLeNet).
-La filosofia qui cambia radicalmente: invece di andare solo in profondità (Deep), andiamo in larghezza (Wide).
+MODELLO: Inception CNN (Ispirato all'architettura GoogLeNet: Szegedy et al. (2015) "Going Deeper with Convolutions")
+DESCRIZIONE:
+    Questa architettura implementa la filosofia "Wide & Deep", ispirata a GoogLeNet. 
+    A differenza delle reti lineari classiche, questo modello punta sulla 
+    parallelizzazione del calcolo per estrarre informazioni a diverse scale spaziali 
+    contemporaneamente nello stesso livello della rete.
 
-In ogni "Inception Module", l'input viene processato PARALLELAMENTE da filtri di dimensioni diverse:
-1. Conv 1x1: Cattura relazioni tra i canali e riduce la dimensionalità.
-2. Conv 3x3: Cattura dettagli medi.
-3. Conv 5x5: Cattura feature più ampie e contestuali.
-4. MaxPool: Mantiene le feature più forti.
-
-Tutti questi risultati vengono CONCATENATI. La rete imparerà autonomamente se per classificare
-quella specifica feature le serve guardare "da vicino" (3x3) o "da lontano" (5x5).
+CARATTERISTICHE ARCHITETTURALI:
+    - Inception Modules (7 blocchi): Il cuore della rete è composto da 7 moduli 
+      Inception. Ogni modulo processa l'input attraverso 4 rami paralleli 
+      (Conv 1x1, 3x3, 5x5 e MaxPool) le cui uscite vengono concatenate.
+    - Profondità Totale: La rete conta 31 layer con parametri apprendibili 
+      (30 convoluzioni e 1 fully connected), strutturati in uno "Stem" iniziale, 
+      3 blocchi di Inception e un classificatore finale.
+    - Feature Extraction: L'uso di kernel di dimensioni differenti 
+      permette alla rete di catturare sia dettagli fini che pattern contestuali 
+      più ampi, adattandosi a oggetti di dimensioni variabili nel dataset.
+    - Efficienza e Regolarizzazione: L'uso dell'Adaptive Average Pooling riduce 
+      drasticamente il numero di parametri finali, mentre il Dropout al 40% 
+      previene l'overfitting nonostante l'elevata larghezza della rete.
 """
 
 class InceptionModule(nn.Module):
@@ -28,7 +36,6 @@ class InceptionModule(nn.Module):
         )
         
         # RAMO 2: Convoluzione 3x3 
-        # Usiamo padding=1 per mantenere le dimensioni uguali all'input
         self.branch2 = nn.Sequential(
             nn.Conv2d(in_channels, out_3x3, kernel_size=3, padding=1),
             nn.BatchNorm2d(out_3x3),
@@ -36,7 +43,6 @@ class InceptionModule(nn.Module):
         )
         
         # RAMO 3: Convoluzione 5x5
-        # Padding=2 per mantenere le dimensioni.
         self.branch3 = nn.Sequential(
             nn.Conv2d(in_channels, out_5x5, kernel_size=5, padding=2),
             nn.BatchNorm2d(out_5x5),
@@ -44,72 +50,85 @@ class InceptionModule(nn.Module):
         )
         
         # RAMO 4: Max Pooling
-        # Seguito da 1x1 per aggiustare i canali se necessario (qui semplificato).
         self.branch4 = nn.Sequential(
             nn.MaxPool2d(kernel_size=3, stride=1, padding=1),
-            nn.Conv2d(in_channels, out_1x1, kernel_size=1), # Proiezione per ridurre canali
+            nn.Conv2d(in_channels, out_1x1, kernel_size=1),
             nn.BatchNorm2d(out_1x1),
             nn.ReLU(inplace=True)
         )
 
     def forward(self, x):
-        # Eseguiamo tutti i rami in parallelo
         y1 = self.branch1(x)
         y2 = self.branch2(x)
         y3 = self.branch3(x)
         y4 = self.branch4(x)
-        
-        # Concateniamo i risultati lungo la dimensione dei canali (dim=1)
-        # L'output avrà canali = out_1x1 + out_3x3 + out_5x5 + out_1x1
         return torch.cat([y1, y2, y3, y4], 1)
 
-class CustomInceptionNet(nn.Module):
+class CustomCNN(nn.Module):
     def __init__(self, num_classes=37):
-        super(CustomInceptionNet, self).__init__()
+        super(CustomCNN, self).__init__()
         
-        # Stem iniziale
+        # --- STEM ---
         self.pre_layers = nn.Sequential(
-            nn.Conv2d(3, 32, kernel_size=3, padding=1),
-            nn.BatchNorm2d(32),
+            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
+            nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(2, 2) # Dimensione immagine 224 -> 112
+            nn.MaxPool2d(3, stride=2, padding=1),
+            
+            nn.Conv2d(64, 192, kernel_size=3, padding=1), 
+            nn.BatchNorm2d(192),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(3, stride=2, padding=1)
         )
 
-        # BLOCCO 1 
-        self.inception1 = InceptionModule(in_channels=32, out_1x1=16, out_3x3=32, out_5x5=16) 
-        # Output canali: 16+32+16+16 = 80 
-
-        self.pool1 = nn.MaxPool2d(2, 2) # Dimensione immagine 112 -> 56
-
-        # BLOCCO 2 
-        self.inception2 = InceptionModule(in_channels=80, out_1x1=48, out_3x3=96, out_5x5=48)
-        # Output canali: 48+96+48+48 = 240 
-
-        self.pool2 = nn.MaxPool2d(2, 2) # Dimensione immagine 56 -> 28
-
-        # BLOCCO 3
-        self.inception3 = InceptionModule(in_channels=240, out_1x1=64, out_3x3=192, out_5x5=64)
-        # Output canali: 64+192+64+64 = 384
-
-        # Global Average Pooling
-        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        # --- BLOCCO 1 ---
+        # Input: 192. 
+        # Output calc: 64 (br1) + 128 (br2) + 32 (br3) + 64 (br4 usa out_1x1) = 288
+        self.inception1a = InceptionModule(192, out_1x1=64, out_3x3=128, out_5x5=32)
         
-        self.dropout = nn.Dropout(0.2)
-        self.fc = nn.Linear(384, num_classes)
+        # Input: 288 (era 256 nel tuo codice, corretto a 288).
+        # Output calc: 128 + 192 + 96 + 128 = 544
+        self.inception1b = InceptionModule(288, out_1x1=128, out_3x3=192, out_5x5=96)
+        
+        self.pool1 = nn.MaxPool2d(3, stride=2, padding=1)
+
+        # --- BLOCCO 2 ---
+       # Input: 544 -> Output calc: 192 + 208 + 48 + 192 = 640
+        self.inception2a = InceptionModule(544, out_1x1=192, out_3x3=208, out_5x5=48)
+        # Input: 640 -> Output calc: 192 + 256 + 64 + 192 = 704
+        self.inception2b = InceptionModule(640, out_1x1=192, out_3x3=256, out_5x5=64)
+        # Input: 704 -> Output calc: 224 + 288 + 64 + 224 = 800
+        self.inception2c = InceptionModule(704, out_1x1=224, out_3x3=288, out_5x5=64)
+        self.pool2 = nn.MaxPool2d(3, stride=2, padding=1)
+
+        # --- BLOCCO 3 --- 
+        # Input: 800 -> Output calc: 256 + 320 + 128 + 256 = 960
+        self.inception3a = InceptionModule(800, out_1x1=256, out_3x3=320, out_5x5=128)
+        # Input: 960 -> Output calc: 384 + 384 + 128 + 384 = 1280
+        self.inception3b = InceptionModule(960, out_1x1=384, out_3x3=384, out_5x5=128)
+        # --- CLASSIFICATORE ---
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.dropout = nn.Dropout(0.4)
+        self.fc = nn.Linear(1280, num_classes)
 
     def forward(self, x):
         x = self.pre_layers(x)
         
-        x = self.inception1(x)
-        x = self.pool1(x)
+        x = self.inception1a(x)
+        x = self.inception1b(x)
+        x = self.pool1(x) 
         
-        x = self.inception2(x)
+        x = self.inception2a(x)
+        x = self.inception2b(x)
+        x = self.inception2c(x)
         x = self.pool2(x)
         
-        x = self.inception3(x)
+        x = self.inception3a(x)
+        x = self.inception3b(x)
         
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
         x = self.dropout(x)
         x = self.fc(x)
+        
         return x
