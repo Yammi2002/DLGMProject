@@ -9,7 +9,7 @@ def download_data():
     Scarica, estrae e organizza il dataset Oxford-IIIT Pet.
     """
     
-    # Rimuoviamo le cartelle se già presenti per avere il dataset completo
+    # Se la funzione viene chiamata con le cartelle già presenti, le rimuoviamo per essere sicuri di avere il dataset completo
     folders_to_clean = ['images', 'annotations', 'res']
     for folder in folders_to_clean:
         if os.path.exists(folder):
@@ -19,7 +19,7 @@ def download_data():
     # Crea la cartella di destinazione
     os.makedirs('res', exist_ok=True)
 
-    # URL dei file
+    # URL dei file: sono presenti sia immagimi che annotazioni per preparare i dati
     urls = {
         'images': 'https://www.robots.ox.ac.uk/~vgg/data/pets/data/images.tar.gz',
         'annotations': 'https://www.robots.ox.ac.uk/~vgg/data/pets/data/annotations.tar.gz'
@@ -45,6 +45,3 @@ def download_data():
     # Pulizia
     if os.path.exists('images.tar.gz'): os.remove('images.tar.gz')
     if os.path.exists('annotations.tar.gz'): os.remove('annotations.tar.gz')
-
-if __name__ == "__main__":
-    download_data()

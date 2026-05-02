@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
 import yaml
-import torch
 import torch.nn as nn
 import torch.optim as optim
 
@@ -20,10 +19,9 @@ class SchedulerType(Enum):
     ONE_CYCLE = "OneCycleLR"
 
 """
-Questa classe consente al programma di essere modulare, andando a recuperare le configurazioni desiderate direttamente da 
-un file e impostando delle variabili.
-Utiliza metodi factory per poter istanziare ottimizzatori e scheduler che verranno poi passati direttamente alla funzione di
-addestramento del modello.
+Questa classe consente al programma di essere modulare, recuperando le configurazioni 
+direttamente da un file YAML.
+Utilizza metodi factory per istanziare ottimizzatori e scheduler da passare al training loop.
 """
 
 @dataclass
@@ -45,12 +43,11 @@ class Config:
     fine_tuning: bool = False
     loss: LossType = LossType.CROSS_ENTROPY
 
-
     # Training
     epochs: int = 30
     patience: int = 7
 
-    # Otiimizzatore
+    # Ottimizzatore
     learning_rate: float = 0.001
     optimizer: OptimizerType = OptimizerType.ADAM
     weight_decay: float = 1e-4  
@@ -69,9 +66,11 @@ class Config:
         with open(yaml_path, 'r') as f:
             yaml_data = yaml.safe_load(f)
             
+        # Filtra solo le chiavi che esistono nella dataclass
         valid_keys = {k: v for k, v in yaml_data.items() if k in cls.__annotations__}
 
         try:
+            # Conversione stringa -> Enum
             if 'loss' in valid_keys:
                 valid_keys['loss'] = LossType(valid_keys['loss'])
             if 'optimizer' in valid_keys:
@@ -94,17 +93,38 @@ class Config:
 
     def init_optimizer(self, model_parameters):
         """Inizializza l'ottimizzatore passando i parametri del modello."""
+        
         if self.optimizer == OptimizerType.ADAM:
+            """
+            Combina informazioni sulla media dei gradienti passati con quella della media delle varianze passate.
+            A differenza di SGD, adatta il Learning Rate per ogni singolo parametro: rallenta 
+            i parametri che oscillano molto e accelera quelli stabili.
+            """
             return optim.Adam(model_parameters, lr=self.learning_rate, 
                               weight_decay=self.weight_decay)
         
         elif self.optimizer == OptimizerType.ADAMW:
+            """
+            Variante moderna di Adam che applica la weight decay (regolarizzazione) 
+            direttamente sui pesi e non sul gradiente.
+            Questo disaccoppiamento migliora drasticamente la generalizzazione rispetto ad Adam classico.
+            """
             return optim.AdamW(model_parameters, lr=self.learning_rate, 
                                weight_decay=self.weight_decay)
         
         elif self.optimizer == OptimizerType.SGD:
+            """
+            Utilizza il calcolo dei gradienti per aggiornare direttamente i pesi del modello.
+            Senza momentum, SGD scende seguendo solo la pendenza attuale.
+            Il momentum aggiunge 'inerzia': accumula velocità nella direzione di discesa, 
+            permettendo di superare piccoli minimi locali e ridurre le oscillazioni laterali.
+            Nesterov è una correzione che 'frena' preventivamente guardando la pendenza futura.
+            """
+            # NOTA: Nesterov richiede momentum > 0
+            momentum_val = self.momentum if self.momentum > 0 else 0.9 
+            
             return optim.SGD(model_parameters, lr=self.learning_rate, 
-                             momentum=self.momentum, 
+                             momentum=momentum_val, 
                              weight_decay=self.weight_decay,
                              nesterov=self.nesterov)
         
@@ -114,13 +134,17 @@ class Config:
         """
         Inizializza lo scheduler.
         :param optimizer: L'ottimizzatore della rete.
-        :param steps_per_epoch: Necessario SOLO per OneCycleLR (len(train_loader)).
+        :param steps_per_epoch: Necessario per OneCycleLR.
         """
         if self.scheduler == SchedulerType.NONE:
             return None
         
         if self.scheduler == SchedulerType.PLATEAU:
-
+            """
+            ReduceLROnPlateau.
+            Osserva la validation loss: se non migliora per 'patience' epoche,
+            riduce il learning rate per scendere nel minimo locale con maggiore precisione.
+            """
             return optim.lr_scheduler.ReduceLROnPlateau(
                 optimizer, 
                 mode='min',  
@@ -128,12 +152,19 @@ class Config:
             )
         
         if self.scheduler == SchedulerType.ONE_CYCLE:
+            """
+            Altera il LR disegnando un'onda: parte basso, sale veloce al massimo, 
+            e poi scende quasi a zero.
+            - La salita veloce aiuta a superare i minimi locali instabili (regolarizzazione).
+            - La discesa finale permette la super-convergenza.
+            Richiede la chiamata al metodo .step() ad ogni bathc, non ad ogni epoca.
+            """
             if steps_per_epoch is None:
                 raise ValueError("Per utilizzare OneCycleLR devi passare 'steps_per_epoch' (len(train_loader)) a init_scheduler!")
             
             return optim.lr_scheduler.OneCycleLR(
                 optimizer,
-                max_lr=self.learning_rate, # Il LR massimo che raggiungerà
+                max_lr=self.learning_rate, # Usa il LR del config come picco massimo
                 epochs=self.epochs,
                 steps_per_epoch=steps_per_epoch
             )

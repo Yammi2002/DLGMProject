@@ -4,14 +4,13 @@ import torch.nn as nn
 """
 MODELLO: Deep & Narrow CNN (Custom VGG-Style)
 DESCRIZIONE:
-    Questa rete implementa una filosofia "Deep & Narrow.
     A differenza delle architetture classiche molto larghe, questa rete punta sulla profondità 
     (10 layer convoluzionali) mantenendo il numero di canali contenuto (max 256).
 
 CARATTERISTICHE ARCHITETTURALI:
     - Stack Convoluzionale: 4 blocchi progressivi. I primi due contengono 2 convoluzioni, 
       gli ultimi due ne contengono 3. Totale: 10 strati di feature extraction.
-    - Efficienza (GAP): L'uso del Global Average Pooling finale elimina la necessità di 
+    - Efficienza: L'uso del Global Average Pooling finale elimina la necessità di 
       pesanti layer Fully Connected intermedi, riducendo drasticamente i parametri 
       e prevenendo l'overfitting.
     - Stabilizzazione: Batch Normalization sistematica dopo ogni conv per permettere 
@@ -75,6 +74,13 @@ class CustomCnn(nn.Module):
         return x
 
     def _initialize_weights(self):
+        """
+        Inizializza i pesi del modello seguendo le best practice per reti deep.
+        Viene fatto sia per i layer convoluzionali che per i layer di batch normalization.
+        Lo scopo è quello di ridurre l'effetto di scomparsa del gradiente, che solitamente si verifica quando aumenta
+        la profondità della rete.
+        Segnale di questo fenomeno è l'innalzamento dell'errore di training e di quello di validazione.
+        """ 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')

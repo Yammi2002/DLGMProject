@@ -4,7 +4,6 @@ import torch.nn as nn
 """
 MODELLO: Inception CNN (Ispirato all'architettura GoogLeNet: Szegedy et al. (2015) "Going Deeper with Convolutions")
 DESCRIZIONE:
-    Questa architettura implementa la filosofia "Wide & Deep", ispirata a GoogLeNet. 
     A differenza delle reti lineari classiche, questo modello punta sulla 
     parallelizzazione del calcolo per estrarre informazioni a diverse scale spaziali 
     contemporaneamente nello stesso livello della rete.
@@ -62,6 +61,11 @@ class InceptionModule(nn.Module):
         y2 = self.branch2(x)
         y3 = self.branch3(x)
         y4 = self.branch4(x)
+
+        """
+        Questa è la particolarità dell'architettura. Quando viene chiamato il metodo forward, vengono applicati kernel di dimensioni
+        differenti sullo stesso input e il loro output viene concatenato in un unico tensore.
+        """
         return torch.cat([y1, y2, y3, y4], 1)
 
 class CustomCNN(nn.Module):
@@ -106,9 +110,10 @@ class CustomCNN(nn.Module):
         self.inception3a = InceptionModule(800, out_1x1=256, out_3x3=320, out_5x5=128)
         # Input: 960 -> Output calc: 384 + 384 + 128 + 384 = 1280
         self.inception3b = InceptionModule(960, out_1x1=384, out_3x3=384, out_5x5=128)
+
         # --- CLASSIFICATORE ---
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.dropout = nn.Dropout(0.4)
+        self.dropout = nn.Dropout(0.4) # Vista la profondità delle rete aggiungiamo un dropout per evitare overfitting
         self.fc = nn.Linear(1280, num_classes)
 
     def forward(self, x):

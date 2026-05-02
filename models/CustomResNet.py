@@ -87,7 +87,10 @@ class CustomCNN(nn.Module):
         #Questo layer serve per ridimensionare il prodotto delle convoluzioni precedenti facendo la media dei valori per ciascun canale. Questo riduce i parametri
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1)) 
 
-        self.fc = nn.Linear(512, num_classes)     
+        self.fc = nn.Linear(512, num_classes)  
+        
+        self._initialize_weights()
+   
 
     def _make_layer(self, in_c, out_c, stride):
         """
@@ -112,3 +115,18 @@ class CustomCNN(nn.Module):
         x = self.fc(x)
         
         return x
+    
+    def _initialize_weights(self):
+        """
+        Inizializza i pesi del modello seguendo le best practice per reti deep.
+        Viene fatto sia per i layer convoluzionali che per i layer di batch normalization.
+        Lo scopo è quello di ridurre l'effetto di scomparsa del gradiente, che solitamente si verifica quando aumenta
+        la profondità della rete.
+        Segnale di questo fenomeno è l'innalzamento dell'errore di training e di quello di validazione.
+        """ 
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)

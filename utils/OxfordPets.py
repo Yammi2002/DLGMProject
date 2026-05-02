@@ -4,6 +4,21 @@ from PIL import Image
 import xml.etree.ElementTree as ET
 import numpy as np
 
+"""
+Questa classe serve a preparare i dati da passare al modello.
+Grazie alla struttura del dataset, è possibile utilizzare informazioni fornite per eseguire operazioni sulle immagini prima
+di passarle al modello da addestrare. 
+Fra queste info, troviamo le coordinate per restituire un ritaglio solo della testa dell'animale (o comunque una porzione dello stesso) oppure
+maschere in grado di evidenziare la porzione dell'immagine in cui è presente l'animale per rimuovere lo sfondo.
+
+Alcune considerazioni: concentrarsi sulla testa dell'animale consente di concentrarsi maggiormente sui dettagli, ma per reti meno complesse
+questo si potrebbe tradurre in perdita di informazioni, in quanto diversi animali sono riconoscibili anche da caratteristiche del corpo.
+La rimozione dello sfondo introduce un bordo netto artificiale, andando a creare un grande distacco fra l'animale e lo sfondo. Viene inoltre
+rimosso contesto alle immagini, che la rete potrebbe usare per la classificazione.
+
+Quando si allena una rete già precedentemente addestrata su immagini senza queste trasformazioni, è possibile che le prestazioni possano peggiorare.
+"""
+
 class OxfordPetsDataset(Dataset):
     def __init__(self, root_dir, transform=None, use_head_crop=False, use_segmentation=False):
         """
@@ -23,7 +38,10 @@ class OxfordPetsDataset(Dataset):
         self.trimaps_dir = os.path.join(root_dir, 'annotations', 'trimaps')
         self.annotations_path = os.path.join(root_dir, 'annotations', 'list.txt')
         
+        # Salviamo le immagini
         self.data = []
+
+        # Salviamo anche le etichette direttamente
         self.targets = []
         
         if not os.path.exists(self.annotations_path):
@@ -34,6 +52,7 @@ class OxfordPetsDataset(Dataset):
                 if line.startswith('#'):
                     continue
                 
+                # Sappiamo che dentro a list abbiamo direttamente il nome della razza e l'etichetta corrispondente
                 parts = line.strip().split()
                 if len(parts) >= 2:
                     image_name = parts[0]
@@ -57,7 +76,7 @@ class OxfordPetsDataset(Dataset):
             # Se l'immagine non c'è, passiamo alla successiva
             return self.__getitem__((idx + 1) % len(self))
         
-        # 2. Gestione Maschera (Segmentation)
+        # Gestione Maschera
         mask = None
         if self.use_segmentation:
             mask_path = os.path.join(self.trimaps_dir, img_name + '.png')
@@ -81,7 +100,7 @@ class OxfordPetsDataset(Dataset):
                     root = tree.getroot()
                     
                     """
-                    Cerchiamo la bounding box. Nel file xlm sono presenti diversi tag annidati, ognuno che salva determinate infomazioni.
+                    Cerchiamo la bounding box. Nel file XML sono presenti diversi tag annidati, ognuno che salva determinate infomazioni.
                     A noi interessano le coordinate spaziali dei due angoli del bounding box, quindi in totale 2 punti: (xmin, ymin), (xmax, ymax).
                     Analizzare solo quella parte aiuta il modello a non confondersi con sfondo ed eventuali altri elementi presenti nella foto, come 
                     persone, arredamento, sfondo.
