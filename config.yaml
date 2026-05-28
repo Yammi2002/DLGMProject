@@ -1,42 +1,30 @@
-# ==========================================
 # 1. IDENTITÀ ESPERIMENTO
-# ==========================================
-model_name: "CustomResNet18_SGD_HeadCrop"   # Nome esperimento
+model_name: "CustomResNet5_18_50_32_01"   # Nome esperimento, nel caso di ripresa addestramento controllare che il nome del modello sia corretto
 resume_training: True                       # Se True, cerca il checkpoint del modello specificato in model_name
 save_on_drive: False                        # Salvataggio su Google Drive
 
-# ==========================================
 # 2. DATI E TRASFORMAZIONI
-# ==========================================
 batch_size: 32
-download_data: True
+download_data: False
 use_augmentation: True     # Attiva rotazioni, flip, ecc. nel training
 use_head_crop: False   
 use_segmentation: True     
 
-# ==========================================
 # 3. MODELLO E TASK
-# ==========================================
-fine_tuning: False         # False = Train from Scratch; True = Pretrained weights
+fine_tuning: False         # False = inizia l'addestramento da zero; True = utilizza i pesi pre-calcolati di una ResNet
 loss: "CrossEntropy"      
 
-# ==========================================
 # 4. TRAINING LOOP
-# ==========================================
-epochs: 50
+ìepochs: 52
 patience: 25               # Patience per Early Stopping
 
-# ==========================================
 # 5. OTTIMIZZAZIONE
-# ==========================================
-optimizer: "SGD"          
+optimizer: "SGD"           # Possibilità: "Adam", "AdamW", "SGD"
 learning_rate: 0.01        
-weight_decay: 0.0005      
+weight_decay: 0.01      
 momentum: 0.9            
 nesterov: True          
 
-# ==========================================
 # 6. SCHEDULER 
-# ==========================================
-scheduler: "OneCycleLR"   
+scheduler: "OneCycleLR"    # Possibilità: "None", "ReduceLROnPlateau", "OneCycleLR"
 scheduler_patience: 3      

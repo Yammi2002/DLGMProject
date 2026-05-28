@@ -114,11 +114,10 @@ class Config:
         
         elif self.optimizer == OptimizerType.SGD:
             """
-            Utilizza il calcolo dei gradienti per aggiornare direttamente i pesi del modello.
-            Senza momentum, SGD scende seguendo solo la pendenza attuale.
-            Il momentum aggiunge 'inerzia': accumula velocità nella direzione di discesa, 
-            permettendo di superare piccoli minimi locali e ridurre le oscillazioni laterali.
-            Nesterov è una correzione che 'frena' preventivamente guardando la pendenza futura.
+            Utilizza il calcolo dei gradienti per aggiornare i pesi. Il momentum aggiunge 'inerzia' accumulando velocità 
+            nella direzione corretta, permettendo di superare minimi locali e ridurre oscillazioni. 
+            La correzione di Nesterov migliora il momentum calcolando il gradiente non nella posizione attuale, 
+            ma nella posizione futura prevista, aumentando la stabilità.
             """
             # NOTA: Nesterov richiede momentum > 0
             momentum_val = self.momentum if self.momentum > 0 else 0.9 
