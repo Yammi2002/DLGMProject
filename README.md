@@ -64,28 +64,28 @@ Interruttori per attivare o disattivare funzionalità specifiche.
 * **`model_name`**: Stringa identificativa per il salvataggio e caricamento dei file `.pth` (checkpoint).
 
 ## Struttura del progetto
-DLGMProject/
-├── project.ipynb          # Notebook principale per il training, testing e visualizzazione
-├── config.yaml            # File di configurazione degli iperparametri
-├── requirements.txt       # Dipendenze necessarie per l'esecuzione
-├── README.md              # Documentazione del progetto
-│
-├── utils/                 # Moduli di utilità per gestione dati e configurazione
-│   ├── config.py          # Gestione modulare delle configurazioni e factory pattern
-│   ├── dataDownloader.py  # Script per il download e l'estrazione del dataset Oxford-IIIT Pet
-│   └── OxfordPets.py      # Gestione del Dataset, data augmentation e preprocessing
-│
-├── Modelli Custom/        # Architetture neurali sviluppate
-│   ├── SimpleCNN.py       # Baseline ispirata a VGG (struttura semplice)
-│   ├── Deep&Narrow.py     # CNN profonda con focus su pochi canali e Global Average Pooling
-│   ├── CustomResNet.py    # Implementazione ResNet-18 con Skip Connections
-│   ├── InceptionModel.py  # Rete parallela ispirata a GoogLeNet
-│   └── MobileCNN.py       # Rete efficiente basata su Depthwise Separable Convolutions
-│
-└── results/               # Output dell'addestramento (matrici di confusione e grafici)
-    ├── SimpleCNN/      
-    ├── Deep&Narrow/     
-    ├── CustomResNet/    
-    ├── InceptionModel/   
-    ├── Fine-tuning/   
-    └── MobileCNN/        
+DLGMProject/                                                                                                     
+├── project.ipynb          # Notebook principale per il training, testing e visualizzazione                                           
+├── config.yaml            # File di configurazione degli iperparametri                                                        
+├── requirements.txt       # Dipendenze necessarie per l'esecuzione                                                            
+├── README.md              # Documentazione del progetto                                                  
+│                                                                                                                            
+├── utils/                 # Moduli di utilità per gestione dati e configurazione                                                                   
+│   ├── config.py          # Gestione modulare delle configurazioni e factory pattern                                                                            
+│   ├── dataDownloader.py  # Script per il download e l'estrazione del dataset Oxford-IIIT Pet                                                                  
+│   └── OxfordPets.py      # Gestione del Dataset, data augmentation e preprocessing                                                               
+│                                                                                                                    
+├── Modelli Custom/        # Architetture neurali sviluppate                                                                                      
+│   ├── SimpleCNN.py       # Baseline ispirata a VGG (struttura semplice)                                                                                 
+│   ├── Deep&Narrow.py     # CNN profonda con focus su pochi canali e Global Average Pooling                                                                           
+│   ├── CustomResNet.py    # Implementazione ResNet-18 con Skip Connections                                                                                        
+│   ├── InceptionModel.py  # Rete parallela ispirata a GoogLeNet                                                                                                
+│   └── MobileCNN.py       # Rete efficiente basata su Depthwise Separable Convolutions                                                                            
+│                                                                                                              
+└── results/               # Output dell'addestramento (matrici di confusione e grafici)                                                              
+    ├── SimpleCNN/                                                                                             
+    ├── Deep&Narrow/                                                                                                       
+    ├── CustomResNet/                                                                                                
+    ├── InceptionModel/                                                                                                
+    ├── Fine-tuning/                                                                                                   
+    └── MobileCNN/                                                                                                        
