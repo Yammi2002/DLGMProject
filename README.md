@@ -16,7 +16,7 @@ Clona il repository e installa le dipendenze necessarie.
 
 ```bash
 git clone https://github.com/Yammi2002/DLGMProject.git
-cd pet-classification-cnn
+cd DLGMProject
 pip install -r requirements.txt
 ```
 
