@@ -43,8 +43,11 @@ Parametri tecnici relativi all'algoritmo di discesa del gradiente.
 * **`momentum`**: (Solo per SGD) Fattore di accelerazione, tipicamente impostato a `0.9`.
 * **`nesterov`**: (Solo per SGD) Se `True`, abilita il Nesterov Momentum per una convergenza più stabile.
 * **`scheduler`**: Politica di gestione del Learning Rate.
-  * `OnCycleLR`
+  * `None`
+  * `OneCycleLR`
   * `ReduceLROnPlateau`
+* **`scheduler_patience`**: Numero di epoche di tolleranza prima di ridurre il Learning Rate.
+* **`label_smoothing`**: Coefficiente per ammorbidire le etichette reali, riducendo l'overfitting e migliorando la generalizzazione.
 
 ### 3. Flags (Opzioni Booleane)
 Interruttori per attivare o disattivare funzionalità specifiche.
