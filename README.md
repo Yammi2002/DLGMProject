@@ -1,4 +1,4 @@
-# Pet Breed Classification: Custom CNNs vs Fine-Tuning
+# Pet Breed Classification using custom CNNs and Fine-Tuning
 
 Questo progetto esplora diverse tecniche di Deep Learning per il riconoscimento e la classificazione delle razze di cani e gatti, utilizzando il dataset **Oxford-IIIT Pet**.
 
