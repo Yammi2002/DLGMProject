@@ -1,5 +1,5 @@
 # 1. IDENTITÀ ESPERIMENTO
-model_name: "CustomResNet5_18_50_32_01"   # Nome esperimento, nel caso di ripresa addestramento controllare che il nome del modello sia corretto
+model_name: "SimpleCnn_8_70_32_001"   # Nome esperimento, nel caso di ripresa addestramento controllare che il nome del modello sia corretto
 resume_training: True                       # Se True, cerca il checkpoint del modello specificato in model_name
 save_on_drive: False                        # Salvataggio su Google Drive
 
@@ -8,23 +8,23 @@ batch_size: 32
 download_data: False
 use_augmentation: True     # Attiva rotazioni, flip, ecc. nel training
 use_head_crop: False   
-use_segmentation: True     
+use_segmentation: False     
 
 # 3. MODELLO E TASK
 fine_tuning: False         # False = inizia l'addestramento da zero; True = utilizza i pesi pre-calcolati di una ResNet
 loss: "CrossEntropy"      
 
 # 4. TRAINING LOOP
-ìepochs: 52
+epochs: 70
 patience: 25               # Patience per Early Stopping
 
 # 5. OTTIMIZZAZIONE
-optimizer: "SGD"           # Possibilità: "Adam", "AdamW", "SGD"
-learning_rate: 0.01        
-weight_decay: 0.01      
+optimizer: "Adam"           # Possibilità: "Adam", "AdamW", "SGD"
+learning_rate: 0.001        
+weight_decay: 0.0001      
 momentum: 0.9            
 nesterov: True          
 
 # 6. SCHEDULER 
-scheduler: "OneCycleLR"    # Possibilità: "None", "ReduceLROnPlateau", "OneCycleLR"
+scheduler: "ReduceLROnPlateau"    # Possibilità: "None", "ReduceLROnPlateau", "OneCycleLR"
 scheduler_patience: 3      
