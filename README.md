@@ -87,13 +87,13 @@ DLGMProject/
 │   ├── dataDownloader.py  # Script per il download e l'estrazione del dataset Oxford-IIIT Pet                                                                  
 │   └── OxfordPets.py      # Gestione del Dataset, data augmentation e preprocessing                                                               
 │                                                                                                                    
-├── Modelli Custom/        # Architetture neurali sviluppate                                                                                      
+├── models/        # Architetture neurali sviluppate                                                                                      
 │   ├── SimpleCNN.py       # Baseline ispirata a VGG (struttura semplice)                                                                                 
-│   ├── Deep&Narrow.py     # CNN profonda con focus su pochi canali e Global Average Pooling                                                                           
+│   ├── Deep&Narrow.py     # CNN profonda con focus su pochi canali e Global Average Pooling                                                                       
 │   ├── CustomResNet.py    # Implementazione ResNet-18 con Skip Connections                                                                                        
 │   ├── InceptionModel.py  # Rete parallela ispirata a GoogLeNet                                                                                                
 │   └── MobileCNN.py       # Rete efficiente basata su Depthwise Separable Convolutions                                                                            
-│                                                                                                              
+├── checkpoints/   # Dove vengono salvati i checkpoint degli addestramenti                                                           
 └── results/               # Output dell'addestramento (matrici di confusione e grafici)                                                              
     ├── SimpleCNN/                                                                                             
     ├── Deep&Narrow/                                                                                                       
