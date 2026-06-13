@@ -57,6 +57,7 @@ Parametri tecnici relativi all'algoritmo di discesa del gradiente.
   * `ReduceLROnPlateau`
 * **`scheduler_patience`**: Numero di epoche di tolleranza prima di ridurre il Learning Rate.
 * **`label_smoothing`**: Coefficiente per ammorbidire le etichette reali, riducendo l'overfitting e migliorando la generalizzazione.
+* **`loss`**: La funzione di costo utilizzata per valutare l'errore del modello (CrossEntropy)
 
 ### 3. Flags (Opzioni Booleane)
 Interruttori per attivare o disattivare funzionalità specifiche.

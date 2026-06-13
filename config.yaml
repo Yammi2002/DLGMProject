@@ -13,6 +13,7 @@ use_segmentation: False
 # 3. MODELLO E TASK
 fine_tuning: False         # False = inizia l'addestramento da zero; True = utilizza i pesi pre-calcolati di una ResNet
 loss: "CrossEntropy"      
+label_smoothing: 0.1
 
 # 4. TRAINING LOOP
 epochs: 70
