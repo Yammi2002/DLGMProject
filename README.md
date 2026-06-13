@@ -19,7 +19,16 @@ git clone https://github.com/Yammi2002/DLGMProject.git
 cd DLGMProject
 pip install -r requirements.txt
 ```
+## Preparazione del Dataset
 
+Il progetto prevede l'utilizzo della cartella `res/` (resources) per contenere i file del dataset. 
+Hai due opzioni per preparare i dati:
+
+1. **Download Automatico:** Nel file `config.yaml`, imposta il flag `download_data: True`. Lo script si occuperà automaticamente di scaricare gli archivi ufficiali, estrarli e posizionare le cartelle `images` e `annotations` al posto giusto.
+2. **Setup Manuale:** Se hai già scaricato il dataset, crea una cartella `res/` nella root del progetto e inserisci all'interno le due cartelle estratte, ottenendo questa configurazione:
+   - `res/images/`: Contiene tutte le immagini `.jpg`.
+   - `res/annotations/`: Contiene le sottocartelle `xmls` e `trimaps`.
+  
 ## Configurazioni
 
 Il comportamento dell'addestramento è controllato dal file **`config.yaml`**. Questo permette di modificare i parametri senza toccare il codice sorgente. Le configurazioni sono divise in tre categorie principali:
@@ -69,7 +78,10 @@ DLGMProject/
 ├── config.yaml            # File di configurazione degli iperparametri                                                        
 ├── requirements.txt       # Dipendenze necessarie per l'esecuzione                                                            
 ├── README.md              # Documentazione del progetto                                                  
-│                                                                                                                            
+│      
+├── res/                   # Cartella contenente i file originali del dataset                                 
+│   ├── images/            # Immagini RGB (.jpg) di cani e gatti                                                       
+│   └── annotations/       # File XML (bounding box), trimaps (segmentazione) e split liste                                                                
 ├── utils/                 # Moduli di utilità per gestione dati e configurazione                                                                   
 │   ├── config.py          # Gestione modulare delle configurazioni e factory pattern                                                                            
 │   ├── dataDownloader.py  # Script per il download e l'estrazione del dataset Oxford-IIIT Pet                                                                  
