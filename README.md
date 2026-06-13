@@ -92,8 +92,10 @@ DLGMProject/
 │   ├── Deep&Narrow.py     # CNN profonda con focus su pochi canali e Global Average Pooling                                                                       
 │   ├── CustomResNet.py    # Implementazione ResNet-18 con Skip Connections                                                                                        
 │   ├── InceptionModel.py  # Rete parallela ispirata a GoogLeNet                                                                                                
-│   └── MobileCNN.py       # Rete efficiente basata su Depthwise Separable Convolutions                                                                            
-├── checkpoints/   # Dove vengono salvati i checkpoint degli addestramenti                                                           
+│   └── MobileCNN.py       # Rete efficiente basata su Depthwise Separable Convolutions 
+│                                                                                                              
+├── checkpoints/   # Dove vengono salvati i checkpoint degli addestramenti      
+│                                                                                       
 └── results/               # Output dell'addestramento (matrici di confusione e grafici)                                                              
     ├── SimpleCNN/                                                                                             
     ├── Deep&Narrow/                                                                                                       
