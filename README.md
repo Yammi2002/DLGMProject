@@ -81,7 +81,8 @@ DLGMProject/
 │      
 ├── res/                   # Cartella contenente i file originali del dataset                                 
 │   ├── images/            # Immagini RGB (.jpg) di cani e gatti                                                       
-│   └── annotations/       # File XML (bounding box), trimaps (segmentazione) e split liste                                                                
+│   └── annotations/       # File XML (bounding box), trimaps (segmentazione) e split liste   
+│                                                                                       
 ├── utils/                 # Moduli di utilità per gestione dati e configurazione                                                                   
 │   ├── config.py          # Gestione modulare delle configurazioni e factory pattern                                                                            
 │   ├── dataDownloader.py  # Script per il download e l'estrazione del dataset Oxford-IIIT Pet                                                                  
@@ -96,7 +97,7 @@ DLGMProject/
 │                                                                                                              
 ├── checkpoints/   # Dove vengono salvati i checkpoint degli addestramenti      
 │                                                                                       
-└── results/               # Output dell'addestramento (matrici di confusione e grafici)                                                              
+└── results/               # Output dell'addestramento (matrici di confusione e grafici)                                                                            
     ├── SimpleCNN/                                                                                             
     ├── Deep&Narrow/                                                                                                       
     ├── CustomResNet/                                                                                                
